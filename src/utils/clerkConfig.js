@@ -17,5 +17,18 @@ export const commonAppearance = {
       formFieldInputShowPasswordButton: "text-slate-400 hover:text-slate-300",
       otpCodeFieldInput: "text-white",
       formResendCodeLink: "text-white hover:text-purple-300",
+
+      // Sign In - Forgot password
+      formFieldAction: "text-white hover:text-white",
+      footerActionLink: "text-white hover: text-white",
+
+      // Sign In - (Email link and Email code buttons)
+      alternativeMethodsBlockButton: "bg-slate-800 border-slate-700 text-white hover:bg-slate-700",
+
+      // 'Back' text
+      backLink: "text-white hover:text-white",
+
+      // Set new password window
+      formFieldRadioLabelTitle: "text-white hover:text-white",
     }
 };
