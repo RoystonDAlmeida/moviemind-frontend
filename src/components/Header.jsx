@@ -37,7 +37,10 @@ const Header = ({ setIsAuthModalOpen, setIsLibraryOpen }) => {
         {isSignedIn ? (
           <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button
+                onClick={() => setIsAuthModalOpen(true)}
+                className="flex items-center gap-2 bg-gradient-to-r from-purple-400 to-pink-600 text-white hover:from-pink-600 hover:to-purple-400"
+              >
                 <UserCircle className="w-4 h-4" />
                 <span>Welcome, {user.firstName || user.emailAddresses[0].emailAddress}</span>
               </Button>
@@ -55,9 +58,8 @@ const Header = ({ setIsAuthModalOpen, setIsLibraryOpen }) => {
           </DropdownMenu>
         ) : (
           <Button
-            variant="outline"
             onClick={() => setIsAuthModalOpen(true)}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 bg-gradient-to-r from-purple-400 to-pink-600 text-white hover:from-pink-600 hover:to-purple-400"
           >
             <UserCircle className="w-4 h-4" />
             Sign In
