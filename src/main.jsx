@@ -6,6 +6,7 @@ import App from './App';
 import './index.css';
 import { syncUserToSupabase } from './lib/clerk-supabase';
 import { commonAppearance } from './utils/clerkConfig'; // Import the config
+import { BrowserRouter } from 'react-router-dom';
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -53,7 +54,11 @@ function Root() {
     }
   }, [isSignedIn]);
 
-  return <App syncStatus={{ isSyncing, syncError }} />;
+  return (
+    <BrowserRouter> {/* Wrap App with BrowserRouter */}
+      <App syncStatus={{ isSyncing, syncError }} />
+    </BrowserRouter>
+  );
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(
