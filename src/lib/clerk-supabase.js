@@ -25,6 +25,7 @@ export async function syncUserToSupabase(user, token) {
       oauth_id: oauthAccount?.externalId || null,
     };
 
+    // sync-user edge function to add users to the table
     const response = await fetch(
       `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sync-user`,
       {
