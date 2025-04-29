@@ -22,7 +22,7 @@ export async function syncUserToSupabase(user, token) {
       last_name: user.lastName,
       avatar_url: user.imageUrl,
       oauth_provider: oauthAccount?.provider || null, // 'oauth_google' or 'oauth_github'
-      oauth_id: oauthAccount?.externalId || null,
+      oauth_id: oauthAccount?.providerUserId || null, // Provider User ID
     };
 
     // sync-user edge function to add users to the table
