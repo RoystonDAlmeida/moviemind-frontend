@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { useAuth } from '@clerk/clerk-react';
 import {
   Dialog,
   DialogContent,
@@ -12,49 +12,132 @@ import { Button } from './ui/button';
 import { toast } from 'sonner';
 
 function UserLibrary({ isOpen, onClose, user }) {
+  const { getToken, isSignedIn } = useAuth();
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isRemoving, setIsRemoving] = useState(null); // State to track which movie is being removed
 
   useEffect(() => {
-    if (isOpen && user) {
+    if (isOpen && isSignedIn) {
       fetchLibrary();
     }
-  }, [isOpen, user]);
+    else if(!isSignedIn) {
+      // Clear movies if user is not signed in when dialog is interacted with
+      setMovies([]);
+      setLoading(false);
+    }
+    // Reset loading state if dialog closes
+    if (!isOpen) {
+      setLoading(true); // Reset loading for next open
+    }
+  }, [isOpen, isSignedIn, getToken]);
 
+  // Fetch user library with saved movies
   const fetchLibrary = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('user_library')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('added_at', { ascending: false });
+      // 1. Get the authentication token
+      const token = await getToken({ template: 'supabase' });
+      if (!token) {
+        // Handle case where token is unavailable (e.g., session expired)
+        toast.error('Authentication session issue. Please log in again.');
 
-      if (error) throw error;
-      setMovies(data || []);
+        // Optionally call a re-auth function if available
+        throw new Error('Authentication token not available.');
+      }
+
+      // 2. Call the backend endpoint
+      const response = await fetch('/api/library', {
+        method: 'GET',
+        headers: {
+          // 3. Include the token for authentication
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      // 4. Handle the response
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Use error message from backend if available
+        throw new Error(data.error || `Failed to load library (${response.status})`);
+      }
+
+      // 5. Update state with data from backend
+      // Ensure the backend returns the full movie details needed for display
+      setMovies(data.library || []);
+
     } catch (error) {
-      console.error('Error fetching library:', error);
-      toast.error('Failed to load your library');
+      console.error('Error fetching library via backend:', error);
+      // Avoid duplicate toasts if token error was already shown
+      if (!error.message.includes('token not available')) {
+          toast.error(error.message || 'Failed to load your library');
+      }
+      setMovies([]); // Clear movies on error
     } finally {
       setLoading(false);
     }
   };
 
   const handleRemove = async (movieId) => {
+
+    // Check auth status and prevent double clicks
+    if (!isSignedIn || isRemoving === movieId) return;
+
+    setIsRemoving(movieId); // Set loading state for this specific movie
+
     try {
-      const { error } = await supabase
-        .from('user_library')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('movie_id', movieId);
+        // 1. Get the authentication token
+        const token = await getToken({ template: 'supabase' });
+        if (!token) {
+            toast.error('Authentication session issue. Please log in again.');
+            // Optionally trigger re-auth if needed
+            throw new Error('Authentication token not available.');
+        }
 
-      if (error) throw error;
+        // 2. Call the backend DELETE endpoint
+        const response = await fetch(`/api/library/${movieId}`, { 
+            method: 'DELETE',
+            headers: {
+                // 3. Include the token for authentication
+                'Authorization': `Bearer ${token}`,
+            },
+        });
 
-      setMovies(movies.filter(m => m.movie_id !== movieId));
-      toast.success('Movie removed from library');
+        // 4. Handle the response
+        let result = {};
+        if (response.status !== 204) {
+            try {
+                result = await response.json(); // Try parsing JSON if not 204
+            } catch (e) {
+                // Handle cases where response is not JSON even if not 204
+                console.warn("Response was not JSON:", response.statusText);
+            }
+        }
+
+
+        if (!response.ok) {
+            // Handle specific auth/permission errors
+            if (response.status === 401 || response.status === 403) {
+                toast.error(result.error || 'Permission denied. Please log in again.');
+                // Optionally trigger re-auth
+            }
+            // Throw an error for other failed responses
+            throw new Error(result.error || `Failed to remove movie (${response.status})`);
+        }
+
+        // 5. Update frontend state on successful removal
+        setMovies(prevMovies => prevMovies.filter(m => m.movie_id !== movieId));
+        toast.success(result.message || 'Movie removed from library'); // Use message from backend if available
+
     } catch (error) {
-      console.error('Error removing movie:', error);
-      toast.error('Failed to remove movie');
+        console.error('Error removing movie via backend:', error);
+        // Avoid duplicate toasts if token error was already shown
+        if (!error.message.includes('token not available')) {
+            toast.error(error.message || 'Failed to remove movie');
+        }
+    } finally {
+        setIsRemoving(null); // Reset loading state regardless of success/failure
     }
   };
 
@@ -94,7 +177,7 @@ function UserLibrary({ isOpen, onClose, user }) {
                   </div>
                   <div className="p-4 flex-1">
                     <div className="flex justify-between items-start">
-                      <h3 className="font-semibold truncate">{movie.title}</h3>
+                      <h3 className="font-semibold truncate text-white">{movie.title}</h3>
                       <Button
                         variant="ghost"
                         size="sm"
