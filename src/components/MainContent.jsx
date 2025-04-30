@@ -1,6 +1,6 @@
 import MovieSearch from './MovieSearch/MovieSearch';
 
-const MainContent = ({ user, setIsAuthModalOpen }) => {
+const MainContent = ({ user, setIsAuthModalOpen, savedMovies, addToSavedMovies }) => {
   return (
     <main className="container mx-auto px-4 py-12">
       <div className="max-w-3xl mx-auto text-center mb-12">
@@ -12,7 +12,12 @@ const MainContent = ({ user, setIsAuthModalOpen }) => {
         </p>
       </div>
 
-      <MovieSearch user={user} onAuthRequired={() => setIsAuthModalOpen(true)} />
+      <MovieSearch 
+        user={user} 
+        onAuthRequired={() => setIsAuthModalOpen(true)}
+        savedMovies={savedMovies} // Pass down
+        addToSavedMovies={addToSavedMovies} // Pass down
+      />
     </main>
   );
 };
