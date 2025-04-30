@@ -6,7 +6,8 @@ import App from './App';
 import './index.css';
 import { syncUserToSupabase } from './lib/clerk-supabase';
 import { commonAppearance } from './utils/clerkConfig'; // Import the config
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom'; // Import Routes and Route
+import NotFound from './components/NotFound'; // Import the NotFound component
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -57,6 +58,11 @@ function Root() {
   return (
     <BrowserRouter> {/* Wrap App with BrowserRouter */}
       <App syncStatus={{ isSyncing, syncError }} />
+      <Routes> {/* Define routes */}
+        {/* Main application route, handles internal state via search params */}
+        <Route path="/*" element={<App syncStatus={{ isSyncing, syncError }} />} />
+        <Route path="*" element={<NotFound />} /> {/* Catch-all 404 route */}
+      </Routes>
     </BrowserRouter>
   );
 }
