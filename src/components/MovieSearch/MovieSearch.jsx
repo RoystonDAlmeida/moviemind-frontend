@@ -8,32 +8,8 @@ import NoResults from './NoResults';
 import ResultsCount from './ResultsCount';
 import { toast } from 'sonner';
 
-const fetchUserLibraryIds = async (getToken) => {
-    try {
-        const token = await getToken({ template: 'supabase' });
-        if (!token) return new Set(); // No token, return empty set
+function MovieSearch({ user, onAuthRequired, savedMovies, addToSavedMovies }) {
 
-        const response = await fetch('/api/library', { 
-            headers: { 'Authorization': `Bearer ${token}` },
-        });
-
-        if (!response.ok) {
-            console.error(`Failed to fetch library: ${response.statusText}`);
-            return new Set(); // Return empty set on error
-        }
-
-        const data = await response.json();
-        if (data && Array.isArray(data.library)) {
-            return new Set(data.library.map(item => item.movie_id));
-        }
-        return new Set();
-    } catch (error) {
-        console.error("Error fetching user library IDs:", error);
-        return new Set(); // Return empty set on exception
-    }
-};
-
-function MovieSearch({ user, onAuthRequired }) {
   // Use Clerk's auth hook
   const { getToken, isSignedIn } = useAuth();
 
@@ -54,23 +30,6 @@ function MovieSearch({ user, onAuthRequired }) {
   const [availableTypes, setAvailableTypes] = useState([]);
   const [availableGenres, setAvailableGenres] = useState([]);
   // Removed numResults state, can derive from filteredRecommendations.length
-
-  // State to maintain saved movie IDs
-  const [savedMovies, setSavedMovies] = useState(new Set());
-
-  // Fetch saved movies when the component mounts or user logs in/out
-  useEffect(() => {
-    const loadLibrary = async () => {
-      if (isSignedIn) {
-        const libraryIds = await fetchUserLibraryIds(getToken);
-        setSavedMovies(libraryIds);
-      } else {
-        setSavedMovies(new Set()); // Clear library if user logs out
-      }
-    };
-    loadLibrary();
-  }, [isSignedIn, getToken]); // Re-run when authentication state changes
-
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -180,7 +139,8 @@ function MovieSearch({ user, onAuthRequired }) {
       }
 
       // 6. Update frontend state on successful addition
-      setSavedMovies(prev => new Set([...prev, movie.id]));
+      // Call the function passed from App to update the central state
+      addToSavedMovies(movie.id);
       toast.success(result.message || 'Added to your library');
 
     } catch (error) {
@@ -252,7 +212,7 @@ function MovieSearch({ user, onAuthRequired }) {
       {!loading && !error && filteredRecommendations.length > 0 && (
         <MovieGrid
           movies={filteredRecommendations}
-          savedMovies={savedMovies} // Pass the set of saved movie IDs
+          savedMovies={savedMovies} // Pass the set of saved movie IDs received from props
           handleSaveMovie={handleAddToLibrary}
           isSaving={isAddingMovie} // Pass the adding state to potentially disable buttons
         />
