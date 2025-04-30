@@ -11,7 +11,7 @@ import { Film, Trash2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { toast } from 'sonner';
 
-function UserLibrary({ isOpen, onClose, user }) {
+function UserLibrary({ isOpen, onClose, user, removeFromSavedMovies }) {
   const { getToken, isSignedIn } = useAuth();
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -127,7 +127,10 @@ function UserLibrary({ isOpen, onClose, user }) {
         }
 
         // 5. Update frontend state on successful removal
+        // Update local list for immediate UI feedback within the dialog
         setMovies(prevMovies => prevMovies.filter(m => m.movie_id !== movieId));
+        // Call the function passed from App to update the central state
+        removeFromSavedMovies(movieId);
         toast.success(result.message || 'Movie removed from library'); // Use message from backend if available
 
     } catch (error) {
