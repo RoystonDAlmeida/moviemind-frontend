@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'; // Added useEffect
+import { useState, useEffect, useCallback } from 'react'; // Added useEffect
 import { useAuth } from '@clerk/clerk-react'; // Import useAuth hook
+import { useSearchParams } from 'react-router-dom'; // Import useSearchParams
 import SearchBar from './SearchBar';
 import FilterBar from './FilterBar';
 import MovieGrid from './MovieGrid';
@@ -13,10 +14,14 @@ function MovieSearch({ user, onAuthRequired, savedMovies, addToSavedMovies }) {
   // Use Clerk's auth hook
   const { getToken, isSignedIn } = useAuth();
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedLanguage, setSelectedLanguage] = useState('all');
-  const [selectedType, setSelectedType] = useState('all');
-  const [selectedGenre, setSelectedGenre] = useState('all');
+  // Get search params hook
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Initialize state from search params or defaults
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const [selectedLanguage, setSelectedLanguage] = useState(searchParams.get('lang') || 'all');
+  const [selectedType, setSelectedType] = useState(searchParams.get('type') || 'all');
+  const [selectedGenre, setSelectedGenre] = useState(searchParams.get('genre') || 'all');
 
   const [loading, setLoading] = useState(false); // Loading state for search results
   const [isAddingMovie, setIsAddingMovie] = useState(false); // Loading state for adding a movie
@@ -31,13 +36,25 @@ function MovieSearch({ user, onAuthRequired, savedMovies, addToSavedMovies }) {
   const [availableGenres, setAvailableGenres] = useState([]);
   // Removed numResults state, can derive from filteredRecommendations.length
 
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
+  // Use useCallback to memoize handleSearch
+  const handleSearch = useCallback(async (query) => {
+    const trimmedQuery = query.trim();
+    if (!trimmedQuery) return;
 
+    // --- Update URL Params on Search Trigger ---
+    // Create a new URLSearchParams object based on the current ones
+    const currentParams = new URLSearchParams(searchParams);
+    // Set the 'q' parameter with the trimmed query
+    currentParams.set('q', trimmedQuery);
+    // Update the URL, replacing the current history entry
+    // This ensures the URL reflects the search term *when* the search starts
+    setSearchParams(currentParams, { replace: true });
+
+    // Reset state before new search
+    setRecommendations([]); // Clear previous results immediately
+    setShowFilters(false); // Hide filters until new results arrive
     setLoading(true);
     setError(null);
-    setRecommendations([]);
-    setShowFilters(false);
 
     try {
       // Fetch Recommendations from backend
@@ -47,7 +64,7 @@ function MovieSearch({ user, onAuthRequired, savedMovies, addToSavedMovies }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          query: searchQuery.trim(), // Trim query before sending
+          query: trimmedQuery, // Use trimmed query
         }),
       });
 
@@ -87,7 +104,38 @@ function MovieSearch({ user, onAuthRequired, savedMovies, addToSavedMovies }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // Effect to run search when component mounts if 'q' param exists
+  useEffect(() => {
+    const initialQuery = searchParams.get('q');
+    if (initialQuery) {
+      // Set the search query state (already done via useState initializer)
+      // Trigger the search
+      handleSearch(initialQuery);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleSearch]); // Add handleSearch as dependency (safe due to useCallback)
+
+  // Effect to update URL when search query or filters change
+  useEffect(() => {
+    // Create a new URLSearchParams object based on the current ones
+    // This preserves existing parameters like 'q'
+    const currentParams = new URLSearchParams(searchParams);
+
+    // Update filter parameters, removing them if 'all' is selected
+    ['lang', 'type', 'genre'].forEach(key => {
+      const value = { lang: selectedLanguage, type: selectedType, genre: selectedGenre }[key];
+      if (value && value !== 'all') {
+          currentParams.set(key, value);
+      } else {
+          currentParams.delete(key); // Remove if 'all' or undefined
+      }
+    });
+
+    // Use replace: true to avoid adding unnecessary entries to browser history
+    setSearchParams(currentParams, { replace: true });
+  }, [selectedLanguage, selectedType, selectedGenre, searchParams, setSearchParams]);
 
   // --- Function to call backend API ---
   const handleAddToLibrary = async (movie) => {
@@ -166,12 +214,17 @@ function MovieSearch({ user, onAuthRequired, savedMovies, addToSavedMovies }) {
     return languageMatch && typeMatch && genreMatch;
   });
 
+  // Wrapper function for the SearchBar component to trigger search and update state
+  const triggerSearch = () => {
+    handleSearch(searchQuery); // Pass the current searchQuery state
+  };
+
   return (
     <div className="space-y-8">
       <SearchBar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        handleSearch={handleSearch}
+        handleSearch={triggerSearch}
         loading={loading} // Pass search loading state
         error={error}
       />
