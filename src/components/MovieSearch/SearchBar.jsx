@@ -1,7 +1,6 @@
-import { Search } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
-import { Loader2 } from 'lucide-react';
 
 function SearchBar({ searchQuery, setSearchQuery, handleSearch, loading, error }) {
   return (
