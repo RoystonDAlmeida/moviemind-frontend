@@ -11,6 +11,7 @@ import { Card } from './ui/card';
 import { Film, Trash2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { toast } from 'sonner';
+import { getApiUrl } from '../utils/apiUtils';
 
 function UserLibrary({ isOpen, onClose, user, removeFromSavedMovies }) {
   const { getToken, isSignedIn } = useAuth();
@@ -48,7 +49,7 @@ function UserLibrary({ isOpen, onClose, user, removeFromSavedMovies }) {
       }
 
       // 2. Call the backend endpoint
-      const response = await fetch('/api/library', {
+      const response = await fetch(getApiUrl('api/library'), {
         method: 'GET',
         headers: {
           // 3. Include the token for authentication
@@ -97,7 +98,7 @@ function UserLibrary({ isOpen, onClose, user, removeFromSavedMovies }) {
         }
 
         // 2. Call the backend DELETE endpoint
-        const response = await fetch(`/api/library/${movieId}`, { 
+        const response = await fetch(getApiUrl(`api/library/${movieId}`), { 
             method: 'DELETE',
             headers: {
                 // 3. Include the token for authentication
