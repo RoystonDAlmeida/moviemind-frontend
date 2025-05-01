@@ -57,7 +57,6 @@ function Root() {
 
   return (
     <BrowserRouter> {/* Wrap App with BrowserRouter */}
-      <App syncStatus={{ isSyncing, syncError }} />
       <Routes> {/* Define routes */}
         {/* Main application route, handles internal state via search params */}
         <Route path="/*" element={<App syncStatus={{ isSyncing, syncError }} />} />
