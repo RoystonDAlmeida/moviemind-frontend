@@ -1,0 +1,30 @@
+{
+  "root": true,
+  "env": { "browser": true, "es2020": true, "jest": true }, // Added jest environment
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime", // Use if using new JSX transform (React 17+)
+    "plugin:react-hooks/recommended",
+    "plugin:jsx-a11y/recommended", // For accessibility rules
+    "plugin:import/recommended" // Helps with import paths/errors
+  ],
+  "ignorePatterns": ["dist", ".eslintrc.json", "vite.config.js", "jest.config.js", "babel.config.js"], // Ignore build output and config files
+  "parserOptions": { "ecmaVersion": "latest", "sourceType": "module" },
+  "settings": {
+    "react": { "version": "detect" }, // Automatically detect React version
+    "import/resolver": { // Helps plugin-import find modules
+      "node": {
+        "extensions": [".js", ".jsx"] // Add .ts, .tsx if using TypeScript
+      }
+    }
+  },
+  "plugins": ["react-refresh"],
+  "rules": {
+    "react-refresh/only-export-components": [
+      "warn",
+      { "allowConstantExport": true }
+    ],
+    "react/prop-types": "off" // Often disabled in modern React with TypeScript/prop-checking elsewhere
+  }
+}
