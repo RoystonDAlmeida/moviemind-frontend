@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@clerk/clerk-react';
+import { Helmet } from 'react-helmet-async'; 
 import {
   Dialog,
   DialogContent,
@@ -146,6 +147,12 @@ function UserLibrary({ isOpen, onClose, user, removeFromSavedMovies }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
+      {/* Set the title specifically when the library dialog is open */}
+      {/* Conditionally render Helmet only when isOpen is true */}
+      {isOpen && <Helmet>
+          <title>{`${user?.firstName ? user.firstName + "'s" : 'Your'} Library - MovieMind`}</title>
+      </Helmet>}
+
       <DialogContent className="sm:max-w-[800px] bg-slate-900 text-white">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">My Movie Library</DialogTitle>
