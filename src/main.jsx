@@ -1,6 +1,7 @@
 // main.jsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { HelmetProvider } from 'react-helmet-async';
 import { ClerkProvider, useUser, useAuth } from '@clerk/clerk-react';
 import App from './App';
 import './index.css';
@@ -56,13 +57,15 @@ function Root() {
   }, [isSignedIn]);
 
   return (
-    <BrowserRouter> {/* Wrap App with BrowserRouter */}
-      <Routes> {/* Define routes */}
-        {/* Main application route, handles internal state via search params */}
-        <Route path="/*" element={<App syncStatus={{ isSyncing, syncError }} />} />
-        <Route path="*" element={<NotFound />} /> {/* Catch-all 404 route */}
-      </Routes>
-    </BrowserRouter>
+    <HelmetProvider> {/* Wrap everything with HelmetProvider */}
+      <BrowserRouter> {/* Wrap App with BrowserRouter */}
+        <Routes> {/* Define routes */}
+          {/* Main application route, handles internal state via search params */}
+          <Route path="/*" element={<App syncStatus={{ isSyncing, syncError }} />} />
+          <Route path="*" element={<NotFound />} /> {/* Catch-all 404 route */}
+        </Routes>
+      </BrowserRouter>
+    </HelmetProvider>
   );
 }
 
