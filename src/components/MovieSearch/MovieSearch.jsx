@@ -8,6 +8,7 @@ import LoadingSpinner from './LoadingSpinner';
 import NoResults from './NoResults';
 import ResultsCount from './ResultsCount';
 import { toast } from 'sonner';
+import { Helmet } from 'react-helmet-async';
 
 function MovieSearch({ user, onAuthRequired, savedMovies, addToSavedMovies }) {
 
@@ -221,6 +222,22 @@ function MovieSearch({ user, onAuthRequired, savedMovies, addToSavedMovies }) {
 
   return (
     <div className="space-y-8">
+      <Helmet>
+        <title>
+          {searchQuery
+            ? `Search Results for "${searchQuery}" - MovieMind`
+            : 'MovieMind | Discover Your Next Favorite Movie'}
+        </title>
+        <meta
+          name="description"
+          content={
+            searchQuery
+              ? `Find movie recommendations similar to "${searchQuery}".`
+              : 'Search for movies and get personalized recommendations on MovieMind.'
+          }
+        />
+      </Helmet>
+
       <SearchBar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
