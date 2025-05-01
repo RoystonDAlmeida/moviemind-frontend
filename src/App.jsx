@@ -9,13 +9,16 @@ import UserLibrary from './components/UserLibrary';
 import { Toaster } from 'sonner';
 import { useUser, useAuth } from '@clerk/clerk-react';
 
+// Import the utility function
+import { getApiUrl } from './utils/apiUtils';
+
 // Function to fetch user library IDs (moved from MovieSearch)
 const fetchUserLibraryIds = async (getToken) => {
   try {
       const token = await getToken({ template: 'supabase' });
       if (!token) return new Set(); // No token, return empty set
 
-      const response = await fetch('/api/library', {
+      const response = await fetch(getApiUrl('api/library'), {
           headers: { 'Authorization': `Bearer ${token}` },
       });
 
