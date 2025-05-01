@@ -169,50 +169,54 @@ function UserLibrary({ isOpen, onClose, user, removeFromSavedMovies }) {
             <p>Your library is empty. Start adding movies you love!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            {movies.map((movie) => (
-              <Card key={movie.movie_id} className="bg-slate-800 border-slate-700 overflow-hidden">
-                <div className="flex">
-                  <div className="w-24 h-36 bg-slate-900 flex-shrink-0">
-                    {movie.poster ? (
-                      <img
-                        src={movie.poster}
-                        alt={movie.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Film className="h-8 w-8 text-slate-700" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4 flex-1">
-                    <div className="flex justify-between items-start">
-                      <h3 className="font-semibold truncate text-white">{movie.title}</h3>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRemove(movie.movie_id)}
-                        className="text-slate-400 hover:text-red-400"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+          /* Outer div for scrolling, padding, and rounded corners */
+          <div className="mt-4 max-h-[65vh] overflow-y-auto px-4 rounded-md focus:outline-none" tabIndex={0}>
+            {/* Inner div for the grid layout */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {movies.map((movie) => (
+                <Card key={movie.movie_id} className="bg-slate-800 border-slate-700 overflow-hidden">
+                  <div className="flex">
+                    <div className="w-24 h-36 bg-slate-900 flex-shrink-0">
+                      {movie.poster ? (
+                        <img
+                          src={movie.poster}
+                          alt={movie.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Film className="h-8 w-8 text-slate-700" />
+                        </div>
+                      )}
                     </div>
-                    <p className="text-sm text-slate-400 mt-1">{movie.year}</p>
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {movie.genres?.map((genre) => (
-                        <span
-                          key={genre}
-                          className="px-2 py-0.5 rounded-full bg-slate-700 text-slate-300 text-xs"
+                    <div className="p-4 flex-1">
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-semibold truncate text-white">{movie.title}</h3>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemove(movie.movie_id)}
+                          className="text-slate-400 hover:text-red-400"
                         >
-                          {genre}
-                        </span>
-                      ))}
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <p className="text-sm text-slate-400 mt-1">{movie.year}</p>
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {movie.genres?.map((genre) => (
+                          <span
+                            key={genre}
+                            className="px-2 py-0.5 rounded-full bg-slate-700 text-slate-300 text-xs"
+                          >
+                            {genre}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              ))}
+            </div>
           </div>
         )}
       </DialogContent>
