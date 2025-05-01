@@ -9,6 +9,7 @@ import NoResults from './NoResults';
 import ResultsCount from './ResultsCount';
 import { toast } from 'sonner';
 import { Helmet } from 'react-helmet-async';
+import { getApiUrl } from '../../utils/apiUtils';
 
 function MovieSearch({ user, onAuthRequired, savedMovies, addToSavedMovies }) {
 
@@ -59,7 +60,7 @@ function MovieSearch({ user, onAuthRequired, savedMovies, addToSavedMovies }) {
 
     try {
       // Fetch Recommendations from backend
-      const response = await fetch('/api/recommendations', {
+      const response = await fetch(getApiUrl('api/recommendations'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -163,7 +164,7 @@ function MovieSearch({ user, onAuthRequired, savedMovies, addToSavedMovies }) {
       }
 
       // 2. Call the backend API endpoint
-      const response = await fetch('/api/library/add', {
+      const response = await fetch(getApiUrl('api/library/add'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
