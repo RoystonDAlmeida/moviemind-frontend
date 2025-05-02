@@ -13,6 +13,8 @@
   - [Overview](#overview)
   - [Features ✨](#features-)
   - [Live Demo / Screenshots 📸](#live-demo--screenshots-)
+    - [Authenticated User Flow](#authenticated-user-flow)
+    - [Unauthenticated User Flow](#unauthenticated-user-flow)
   - [Backend Repository ⚙️](#backend-repository-️)
   - [Tech Stack 🛠️](#tech-stack-️)
   - [Local Setup and Installation 🚀](#local-setup-and-installation-)
@@ -24,7 +26,7 @@
 
 ## Overview
 
-This repository contains the frontend implementation for MovieMind. It provides a user interface for browsing movies, getting recommendations, adding favorites to user library and managing user accounts.
+This repository contains the frontend implementation for MovieMind. It provides a user interface for browsing movies, getting recommendations, adding favorites to the user library, and managing user accounts. User data, synchronized via Clerk and a Supabase Edge Function, is persisted in a Supabase database managed by the backend.
 
 ## Features ✨
 
@@ -36,12 +38,19 @@ This repository contains the frontend implementation for MovieMind. It provides 
 
 ## Live Demo / Screenshots 📸
 
+### Authenticated User Flow
+[![Authenticated Demo Thumbnail](assets/auth-thumbnail.png)](assets/moviemind_authenticated_user_demo.gif)
+*(Click the image to view the demo)*
+
+### Unauthenticated User Flow
+[![Unauthenticated Demo Thumbnail](assets/unauth-thumbnail.png)](assets/moviemind_unauthenticated_user_demo.gif)
+*(Click the image to view the demo)*
 
 ## Backend Repository ⚙️
 
 The backend logic, including the recommendation engine, database interactions, and core API, is maintained in a separate repository. You will need to have the backend service running for this frontend application to function correctly.
 
-**Backend Repository:** [Link to your backend repository here] (e.g., `https://github.com/RoystonDAlmeida/moviemind-backend.git`)
+**Backend Repository:** [moviemind-backend](https://github.com/RoystonDAlmeida/moviemind-backend.git)
 
 *➡️ Please refer to the backend repository's README for its setup instructions.*
 
@@ -50,6 +59,7 @@ The backend logic, including the recommendation engine, database interactions, a
 *   **Framework/Library:** `React`
 *   **Authentication:** `Clerk`
 *   **Styling:** `Tailwind CSS`
+*   **Backend Integration (User Sync):** `Supabase` (Edge Functions & Database)
 *   **Build Tool:** `Vite`
 *   **Package Manager:** `npm`
 
