@@ -52,7 +52,7 @@ The backend logic, including the recommendation engine, database interactions, a
 
 **Backend Repository:** [moviemind-backend](https://github.com/RoystonDAlmeida/moviemind-backend.git)
 
-*➡️ Please refer to the backend repository's README for its setup instructions.*
+*➡️ Please refer to the backend repository's README for setup instructions.*
 
 ## Tech Stack 🛠️
 
